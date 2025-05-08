@@ -21,7 +21,7 @@ class ProductFilter {
     const deleteArea = ["keyword", "pagination", "limit"];
     deleteArea.forEach((item) => delete queryCopy[item]);
 
-    const queryStr = JSON.stringify(queryCopy);
+    let queryStr = JSON.stringify(queryCopy);
     queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
 
     this.query = this.query.find(JSON.parse(queryStr));
