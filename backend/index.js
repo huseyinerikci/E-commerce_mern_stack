@@ -5,6 +5,8 @@ const cookieParser = require("cookie-parser");
 const dotenv = require("dotenv");
 const db = require("./config/db.js");
 const product = require("./routes/product.js");
+const user = require("./routes/user.js");
+
 const cloudinary = require("cloudinary").v2;
 
 dotenv.config();
@@ -12,7 +14,7 @@ dotenv.config();
 cloudinary.config({
   cloud_name: process.env.CLOUD_NAME,
   api_key: process.env.API_KEY,
-  api_secret: process.env.API_SECRET, // Click 'View API Keys' above to copy your API secret
+  api_secret: process.env.API_SECRET,
 });
 
 const app = express();
@@ -22,6 +24,7 @@ app.use(bodyParser.urlencoded({ limit: "30mb", extended: true }));
 app.use(cookieParser());
 
 app.use("/", product);
+app.use("/", user);
 
 db();
 

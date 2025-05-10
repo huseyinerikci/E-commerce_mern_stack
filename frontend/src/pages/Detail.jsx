@@ -5,6 +5,7 @@ import { getProductDetail } from "../redux/slice/productSlice";
 import Slider from "react-slick";
 import { BsFillStarFill } from "react-icons/bs";
 import Button from "../components/Button";
+import { addToCart } from "../redux/slice/cartSlice";
 
 const Detail = () => {
   const { id } = useParams();
@@ -25,9 +26,18 @@ const Detail = () => {
     slidesToShow: 1,
     slidesToScroll: 1,
   };
-  const addBasket = () => {};
+  const addBasket = () => {
+    const data = {
+      id: product?.product?._id,
+      name: product?.product?.name,
+      image: product?.product?.images?.[0],
+      price: product?.product?.price,
+      quantity: product?.product?.quantity,
+    };
+    dispatch(addToCart(data));
+  };
   const decrement = () => {
-    if (quantity > 0) {
+    if (quantity > 1) {
       setQuantity(quantity - 1);
     }
   };

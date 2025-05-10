@@ -3,6 +3,7 @@ const ProductFilter = require("../utils/productFilter.js");
 const cloudinary = require("cloudinary").v2;
 
 const allProducts = async (req, res) => {
+  console.log("Received query params:", req.query);
   const resultPerPage = 10;
   const productFilter = new ProductFilter(Product.find(), req.query)
     .search()
@@ -39,9 +40,10 @@ const createProduct = async (req, res, next) => {
   }
 
   req.body.images = allImage;
+  req.body.user = req.user._id;
   const product = await Product.create(req.body);
 
-  res.status(201).json({ products });
+  res.status(201).json({ product });
 };
 const deleteProduct = async (req, res, next) => {
   const product = await Product.findById(req.params.id);

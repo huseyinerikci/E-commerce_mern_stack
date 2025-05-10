@@ -1,6 +1,6 @@
 const User = require("../models/user.js");
 const bcrypt = require("bcryptjs");
-const jwt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const cloudinary = require("cloudinary").v2;
 const crypto = require("crypto");
 const nodemailer = require("nodemailer");
@@ -63,7 +63,7 @@ const login = async (req, res) => {
   }
 
   const token = await jwt.sign({ id: user._id }, "SECRETTOKEN", {
-    expiresIn: "1h",
+    expiresIn: "7d",
   });
   const cookieOptions = {
     httpOnly: true,
@@ -105,12 +105,12 @@ const forgotPassword = async (req, res) => {
   const message = `Şifre sıfırlama tokenı: ${passwordUrl}`;
   try {
     const transporter = nodemailer.createTransport({
-      port: 465,
-      service: "gmail",
-      host: "smtp.gmail.com",
+      port: process.env.MAIL_PORT,
+      host: process.env.MAIL_HOST,
+      // service:"gmail",
       auth: {
-        user: process.env.EMAIL,
-        pass: "password",
+        user: process.env.MAIL_USER,
+        pass: process.env.MAIL_PASS,
       },
       secure: true,
     });
@@ -167,7 +167,7 @@ const resetPassword = async (req, res) => {
 };
 
 const userDetail = async (req, res, next) => {
-  const user = await User.findById(req.params.id);
+  const user = await User.findById(req.user.id);
   res.status(200).json({ user });
 };
 

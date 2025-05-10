@@ -1,12 +1,15 @@
 import React, { useState } from "react";
 import { SlBasket } from "react-icons/sl";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { getKeyword } from "../redux/slice/generalSlice";
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [keyword, setKeyword] = useState("");
+  const { user, isAuth } = useSelector((state) => state.user);
+  const { carts } = useSelector((state) => state.cart);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -14,6 +17,14 @@ const Header = () => {
     dispatch(getKeyword(keyword));
     setKeyword("");
     navigate("/products");
+  };
+  const menuFunc = (item) => {
+    if (item == "Çıkış") {
+      localStorage.clear();
+      window.location = "/";
+    } else {
+      window.location = item.url;
+    }
   };
 
   const menuItems = [
@@ -52,14 +63,15 @@ const Header = () => {
         <div className="relative">
           <img
             onClick={() => setOpenMenu(!openMenu)}
-            src="/profile.png"
+            src={user?.user ? user?.user?.avatar?.url : "/profile.png"}
             alt="profil"
             className="w-8 h-8 rounded-full cursor-pointer"
           />
           {openMenu && (
-            <div className="absolute right-0 mt-3 w-[200px] bg-white shadow-lg shadow-gray-400">
+            <div className="absolute right-0 mt-3 w-[200px] bg-white shadow-lg shadow-gray-400 z-1">
               {menuItems.map((item, key) => (
                 <div
+                  onClick={() => menuFunc(item)}
                   key={key}
                   className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
                 >
@@ -69,10 +81,10 @@ const Header = () => {
             </div>
           )}
         </div>
-        <div className="relative">
+        <div onClick={() => navigate("/cart")} className="relative">
           <SlBasket size={30} />
           <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-            4
+            {carts?.length}
           </div>
         </div>
       </div>

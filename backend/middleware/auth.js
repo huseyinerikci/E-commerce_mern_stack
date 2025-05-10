@@ -2,19 +2,31 @@ const User = require("../models/user.js");
 const jwt = require("jsonwebtoken");
 
 const authMid = async (req, res, next) => {
-  const { token } = req.cookies;
+  const authHeader = req.headers.authorization;
 
-  if (!token) {
-    return res.status(500).json({ message: "Erişim için Login olunuz" });
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({ message: "Erişim için Login olunuz" });
   }
 
-  const decodedData = jwt.verify(token, "SECRETTOKEN");
-  if (!decodedData) {
-    return res.status(500).json({ message: "Erişim tokenı geçersiz" });
-  }
+  const token = authHeader.split(" ")[1];
 
-  req.user = await User.findById(decodedData.id);
-  next();
+  try {
+    const decodedData = jwt.verify(token, "SECRETTOKEN");
+
+    const user = await User.findById(decodedData.id);
+
+    if (!user) {
+      return res.status(403).json({ message: "Kullanıcı bulunamadı" });
+    }
+
+    // req.user'ı ata
+    req.user = user;
+    next();
+  } catch (error) {
+    return res
+      .status(403)
+      .json({ message: "Geçersiz veya süresi dolmuş token" });
+  }
 };
 
 const roleChecked = (...roles) => {

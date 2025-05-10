@@ -1,9 +1,10 @@
-import React from "react";
 import { useNavigate } from "react-router-dom";
 import Slider from "react-slick";
+import { AiFillEdit, AiFillDelete } from "react-icons/ai";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, edit }) => {
   const navigate = useNavigate();
+
   const settings = {
     dots: true,
     infinite: true,
@@ -11,18 +12,36 @@ const ProductCard = ({ product }) => {
     slidesToShow: 1,
     slidesToScroll: 1,
   };
+
   return (
     <div
       onClick={() => navigate(`/product/${product?._id}`)}
-      className="w-[1250px] bg-gray-100"
+      className="w-[300px] bg-white rounded-xl shadow-md p-3 cursor-pointer hover:shadow-lg transition"
     >
-      <Slider {...settings}>
-        {product?.images?.map((image, i) => (
-          <img src={image.url} alt="imgSlide" />
-        ))}
-      </Slider>
-      <div className="text-xl px-3">{product?.name}</div>
-      <div className="text-2xl px-3">{product?.price}</div>
+      <div className="w-full h-[200px] overflow-hidden rounded-lg">
+        <Slider {...settings}>
+          {product?.images?.map((image, i) => (
+            <img
+              key={i}
+              src={image.url}
+              alt="product"
+              className="w-full h-[200px] object-cover rounded"
+            />
+          ))}
+        </Slider>
+      </div>
+
+      <div className="mt-3">
+        <div className="text-lg font-semibold">{product?.name}</div>
+        <div className="text-base text-gray-700">{product?.price} ₺</div>
+      </div>
+
+      {edit && (
+        <div className="absolute flex items-center gap-2 top-2 right-2">
+          <AiFillEdit size={20} className="text-blue-500" />
+          <AiFillDelete size={20} className="text-red-500" />
+        </div>
+      )}
     </div>
   );
 };

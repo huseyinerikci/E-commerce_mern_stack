@@ -1,21 +1,50 @@
-import React, { useState } from "react";
-import { useDispatch } from "react-redux";
+import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Input from "../components/Input";
 import Button from "../components/Button";
+import { login, register } from "../redux/slice/userSlice";
+import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const [signUp, setSignUp] = useState(true);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { user, isAuth } = useSelector((state) => state.user);
   const [data, setData] = useState({
     name: "",
     email: "",
     password: "",
-    file: "",
+    avatar: "",
   });
   const [preview, setPreview] = useState("/profile.png");
 
-  const registerFunc = () => {};
-  const loginFunc = () => {};
+  const registerFunc = () => {
+    dispatch(register(data));
+  };
+  const loginFunc = () => {
+    dispatch(login(data));
+  };
+
+  const handleChange = (e) => {
+    if (e.target.name == "avatar") {
+      const reader = new FileReader();
+      reader.onload = () => {
+        if (reader.readyState === 2) {
+          setData((prev) => ({ ...prev, avatar: reader.result }));
+          setPreview(reader.result);
+        }
+      };
+      reader.readAsDataURL(e.target.files[0]);
+    } else {
+      setData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
+    }
+  };
+
+  useEffect(() => {
+    if (isAuth) {
+      navigate("/");
+    }
+  }, [isAuth]);
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="w-1/3 -mt-10 border p-4 rounded-md ">
@@ -23,10 +52,26 @@ const Auth = () => {
           {signUp ? "Kayıt Ol" : "Giriş Yap"}
         </div>
         {signUp && (
-          <Input type={"text"} name={"name"} id={""} placeholder={"Ad"} />
+          <Input
+            onChange={handleChange}
+            value={data.name}
+            type={"text"}
+            name={"name"}
+            id={""}
+            placeholder={"Ad"}
+          />
         )}
-        <Input type={"text"} name={"email"} id={""} placeholder={"Email"} />
         <Input
+          onChange={handleChange}
+          value={data.email}
+          type={"text"}
+          name={"email"}
+          id={""}
+          placeholder={"Email"}
+        />
+        <Input
+          onChange={handleChange}
+          value={data.password}
           type={"password"}
           name={"password"}
           id={""}
@@ -39,7 +84,21 @@ const Auth = () => {
               src={preview}
               alt="preview"
             />
-            <Input type={"file"} name={"avatar"} id={""} placeholder={""} />
+            <Input
+              onChange={handleChange}
+              type={"file"}
+              name={"avatar"}
+              id={""}
+              placeholder={""}
+            />
+          </div>
+        )}
+        {!signUp && (
+          <div
+            onClick={() => navigate("/forgot")}
+            className="text-red-400 my-2 text-sm cursor-pointer"
+          >
+            Şifremi unuttum
           </div>
         )}
         <div

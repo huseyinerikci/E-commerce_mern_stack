@@ -1,5 +1,3 @@
-import React from "react";
-
 const Filter = ({ setPrice, setRating, setCategory }) => {
   const categoryList = ["Telefon", "Bilgisayar", "Çanta", "Ayakkabı", "Elbise"];
   const ratingList = [1, 2, 3, 4, 5];
@@ -9,7 +7,7 @@ const Filter = ({ setPrice, setRating, setCategory }) => {
       <div className="flex items-center gap-2 my-2">
         <input
           onChange={(e) =>
-            setPrice((prev) => ({ ...prev, min: e.target.value }))
+            setPrice((prev) => ({ ...prev, min: Number(e.target.value) }))
           }
           className="border w-16 outline-none"
           type="number"
@@ -17,7 +15,7 @@ const Filter = ({ setPrice, setRating, setCategory }) => {
         />
         <input
           onChange={(e) =>
-            setPrice((prev) => ({ ...prev, max: e.target.value }))
+            setPrice((prev) => ({ ...prev, max: Number(e.target.value) }))
           }
           className="border w-16 outline-none"
           type="number"

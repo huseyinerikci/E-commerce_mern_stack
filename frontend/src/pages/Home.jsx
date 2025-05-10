@@ -11,7 +11,7 @@ const Home = () => {
   }, [dispatch]);
 
   return (
-    <>
+    <div className="min-h-screen">
       <div>
         <img className="w-full" src="./banner.jpg" alt="banner" />
       </div>
@@ -19,16 +19,16 @@ const Home = () => {
         "Loading.."
       ) : (
         <div>
-          {products?.products && (
+          {products && (
             <div className="flex items-center justify-center gap-5 my-5 flex-wrap">
-              {products?.products?.map((product, key) => (
+              {products?.map((product, key) => (
                 <ProductCard product={product} key={key} />
               ))}
             </div>
           )}
         </div>
       )}
-    </>
+    </div>
   );
 };
 
