@@ -17,9 +17,9 @@ const Admin = () => {
   const [data, setData] = useState({
     name: "",
     description: "",
-    rating: null,
-    price: null,
-    stock: null,
+    rating: "",
+    price: "",
+    stock: "",
     category: "",
     images: [],
   });
@@ -108,15 +108,19 @@ const Admin = () => {
     dispatch(openModalFunc());
   };
   return (
-    <div className="min-h-screen">
-      <Button text={"Ürün Ekle"} onClick={addProduct} />
+    <div className="min-h-screen p-5">
+      <div className="w-[100px]">
+        <Button text={"Ürün Ekle"} onClick={addProduct} />
+      </div>
+
       {adminProducts?.products && (
-        <div className="flex items-center justify-center gap-5 my-5 flex-wrap">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 my-5">
           {adminProducts?.products?.map((product, key) => (
             <ProductCard edit={true} product={product} key={key} />
           ))}
         </div>
       )}
+
       {openModal && (
         <Modal
           title={"Ürün Ekle"}

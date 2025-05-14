@@ -3,7 +3,6 @@ const ProductFilter = require("../utils/productFilter.js");
 const cloudinary = require("cloudinary").v2;
 
 const allProducts = async (req, res) => {
-  console.log("Received query params:", req.query);
   const resultPerPage = 10;
   const productFilter = new ProductFilter(Product.find(), req.query)
     .search()
@@ -21,6 +20,7 @@ const detailProducts = async (req, res) => {
 
 //admin
 const createProduct = async (req, res, next) => {
+  console.log("Gelen veri:", req.body);
   let images = [];
   if (typeof req.body.images === "string") {
     images.push(req.body.images);

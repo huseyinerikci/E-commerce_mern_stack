@@ -8,19 +8,17 @@ import ReactPaginate from "react-paginate";
 const Products = () => {
   const dispatch = useDispatch();
   const { products, loading } = useSelector((state) => state.products);
-  console.log("Redux Products:", products);
+
   const { keyword } = useSelector((state) => state.general);
   const [price, setPrice] = useState({ min: 0, max: 5000 });
   const [rating, setRating] = useState(0);
   const [category, setCategory] = useState("");
   const [itemOffset, setItemOffset] = useState(0);
-  console.log("Filtered products:", products);
 
   const endOffset = itemOffset + 5;
 
   const currentItems = products?.slice(itemOffset, endOffset);
   const pageCount = Math.ceil(products?.length / 3);
-  console.log("currentItems", currentItems);
 
   const handlePageClick = (event) => {
     const newOffset = (event.selected * 3) % products?.length;
@@ -40,9 +38,7 @@ const Products = () => {
       filters["price[lte]"] = price.max;
     }
 
-    dispatch(getProducts(filters)).then(() => {
-      console.log("Filtered products:", products); // Burada ürünleri logla
-    });
+    dispatch(getProducts(filters));
   }, [dispatch, keyword, price, rating, category]);
 
   return (

@@ -16,7 +16,7 @@ const ProductCard = ({ product, edit }) => {
   return (
     <div
       onClick={() => navigate(`/product/${product?._id}`)}
-      className="w-[300px] bg-white rounded-xl shadow-md p-3 cursor-pointer hover:shadow-lg transition"
+      className="w-[300px] bg-white rounded-xl shadow-md p-3 cursor-pointer hover:shadow-lg transition relative"
     >
       <div className="w-full h-[200px] overflow-hidden rounded-lg">
         <Slider {...settings}>
@@ -37,9 +37,9 @@ const ProductCard = ({ product, edit }) => {
       </div>
 
       {edit && (
-        <div className="absolute flex items-center gap-2 top-2 right-2">
-          <AiFillEdit size={20} className="text-blue-500" />
-          <AiFillDelete size={20} className="text-red-500" />
+        <div className="absolute flex items-center gap-2 top-4 right-4">
+          <AiFillEdit size={25} className="text-blue-500 " />
+          <AiFillDelete size={25} className="text-red-500 " />
         </div>
       )}
     </div>

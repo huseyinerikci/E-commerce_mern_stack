@@ -7,40 +7,32 @@ const initialState = {
   loading: false,
 };
 export const getProducts = createAsyncThunk(
-  "products/getProducts",
-  async (filters) => {
+  "products",
+  async (params, thunkAPI) => {
     try {
-      const queryParams = new URLSearchParams(filters).toString();
-      const response = await fetch(
-        `http://localhost:4000/products?${queryParams}`
-      );
-      const data = await response.json();
-      return data.products; // Burada backend'den dönen 'products' veri döndürülüyor
+      const queryParams = new URLSearchParams();
+
+      if (params?.keyword) queryParams.append("keyword", params.keyword);
+      if (params?.category) queryParams.append("category", params.category);
+      if (params?.rating) queryParams.append("rating[gte]", params.rating);
+      if (params?.["price[gte]"])
+        queryParams.append("price[gte]", params["price[gte]"]);
+      if (params?.["price[lte]"])
+        queryParams.append("price[lte]", params["price[lte]"]);
+
+      const url = `http://localhost:4000/products?${queryParams.toString()}`;
+      const res = await fetch(url);
+
+      if (!res.ok) throw new Error("Ürünler alınamadı");
+
+      const data = await res.json();
+      return data.products;
     } catch (error) {
-      console.error("Error fetching products:", error);
-      return [];
+      console.error("getProducts error:", error);
+      return thunkAPI.rejectWithValue(error.message);
     }
   }
 );
-
-// export const getProducts = createAsyncThunk("products", async (params) => {
-//   const queryParams = new URLSearchParams();
-
-//   // Parametreleri doğru şekilde query string'e ekleyin
-//   if (params.keyword) queryParams.append("keyword", params.keyword);
-//   if (params.category) queryParams.append("category", params.category);
-//   if (params.rating) queryParams.append("rating[gte]", params.rating);
-//   if (params["price[gte]"])
-//     queryParams.append("price[gte]", params["price[gte]"]);
-//   if (params["price[lte]"])
-//     queryParams.append("price[lte]", params["price[lte]"]);
-
-//   const url = `http://localhost:4000/products?${queryParams.toString()}`;
-//   const res = await fetch(url);
-//   const data = await res.json();
-
-//   return data.products; // Sadece ürünleri dön
-// });
 
 export const getAdminProducts = createAsyncThunk("admin", async () => {
   const token = localStorage.getItem("token");
@@ -54,13 +46,14 @@ export const addAdminProducts = createAsyncThunk("adminadd", async (data) => {
   const token = localStorage.getItem("token");
   const requestOptions = {
     method: "POST",
-    headers: { authorization: `Bearer ${token}` },
-    body: JSON.stringify({ data }),
+
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
   };
-  const res = await fetch(
-    `http://localhost:4000/admin/product/new`,
-    requestOptions
-  );
+  const res = await fetch(`http://localhost:4000/products/new`, requestOptions);
   return await res.json();
 });
 
@@ -80,10 +73,6 @@ export const productSlice = createSlice({
     builder.addCase(getProducts.fulfilled, (state, action) => {
       state.loading = false;
       state.products = action.payload;
-    });
-    builder.addCase(getProducts.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.error.message;
     });
 
     builder.addCase(getProductDetail.pending, (state, action) => {

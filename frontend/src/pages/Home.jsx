@@ -20,7 +20,7 @@ const Home = () => {
       ) : (
         <div>
           {products && (
-            <div className="flex items-center justify-center gap-5 my-5 flex-wrap">
+            <div className="flex items-center justify-start gap-5 px-5 my-5 flex-wrap">
               {products?.map((product, key) => (
                 <ProductCard product={product} key={key} />
               ))}
