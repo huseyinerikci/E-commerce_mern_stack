@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 const initialState = {
-  user: {},
+  user: null,
   isAuth: false,
   loading: false,
 };
@@ -22,7 +22,7 @@ export const login = createAsyncThunk("login", async (data) => {
   };
   const response = await fetch(`http://localhost:4000/login`, requestOptions);
   let res = await response.json();
-  console.log("Login yanıtı:", res);
+
   localStorage.setItem("token", res?.token);
   return res;
 });
@@ -77,34 +77,51 @@ export const resetPassword = createAsyncThunk("reset", async (params) => {
 export const userSlice = createSlice({
   name: "user",
   initialState,
-  reducers: {},
+  reducers: {
+    logout: (state) => {
+      localStorage.removeItem("token");
+      state.user = {};
+      state.isAuth = false;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(register.pending, (state, action) => {
       state.loading = true;
       state.isAuth = false;
     });
-    builder.addCase(register.fulfilled, (state, action) => {
-      state.loading = false;
-      state.isAuth = true;
-      state.user = action.payload;
-    });
+    builder
+      .addCase(register.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuth = true;
+        state.user = action.payload.user;
+      })
+      .addCase(register.rejected, (state) => {
+        state.loading = false;
+        state.isAuth = false;
+      });
     builder.addCase(login.pending, (state, action) => {
       state.loading = true;
       state.isAuth = false;
     });
-    builder.addCase(login.fulfilled, (state, action) => {
-      state.loading = false;
-      state.isAuth = true;
-      state.user = action.payload;
-    });
+    builder
+      .addCase(login.fulfilled, (state, action) => {
+        state.loading = false;
+        state.isAuth = true;
+        state.user = action.payload.user;
+      })
+      .addCase(login.rejected, (state) => {
+        state.loading = false;
+        state.isAuth = false;
+        state.user = {};
+      });
     builder.addCase(profile.pending, (state, action) => {
       state.loading = true;
-      state.isAuth = false;
     });
     builder.addCase(profile.fulfilled, (state, action) => {
       state.loading = false;
       state.isAuth = true;
-      state.user = action.payload;
+
+      state.user = action.payload.user;
     });
     builder.addCase(profile.rejected, (state, action) => {
       state.loading = false;
@@ -114,18 +131,26 @@ export const userSlice = createSlice({
     builder.addCase(forgotPassword.pending, (state, action) => {
       state.loading = true;
     });
-    builder.addCase(forgotPassword.fulfilled, (state, action) => {
-      state.loading = false;
-    });
+    builder
+      .addCase(forgotPassword.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(forgotPassword.rejected, (state) => {
+        state.loading = false;
+      });
     builder.addCase(resetPassword.pending, (state, action) => {
       state.loading = true;
     });
-    builder.addCase(resetPassword.fulfilled, (state, action) => {
-      state.loading = false;
-    });
+    builder
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.loading = false;
+      })
+      .addCase(resetPassword.rejected, (state) => {
+        state.loading = false;
+      });
   },
 });
 
-export const {} = userSlice.actions;
+export const { logout } = userSlice.actions;
 
 export default userSlice.reducer;

@@ -1,15 +1,16 @@
 import React, { useState } from "react";
 import { SlBasket } from "react-icons/sl";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { getKeyword } from "../redux/slice/generalSlice";
+import { logout } from "../redux/slice/userSlice";
+import { clearCart } from "../redux/slice/cartSlice";
 
 const Header = () => {
   const [openMenu, setOpenMenu] = useState(false);
   const [keyword, setKeyword] = useState("");
   const { user, isAuth } = useSelector((state) => state.user);
   const { carts } = useSelector((state) => state.cart);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
@@ -19,11 +20,12 @@ const Header = () => {
     navigate("/products");
   };
   const menuFunc = (item) => {
-    if (item == "Çıkış") {
-      localStorage.clear();
-      window.location = "/";
+    if (item.name === "Çıkış") {
+      dispatch(logout()); // Çıkış işlemi
+      dispatch(clearCart()); // Sepeti temizle
+      navigate("/auth"); // Login sayfasına yönlendir
     } else {
-      window.location = item.url;
+      navigate(item.url); // Menüye tıklanıp sayfaya git
     }
   };
 
@@ -33,17 +35,23 @@ const Header = () => {
       url: "/profile",
     },
     {
+      name: "Ürünler",
+      url: "/products",
+    },
+    {
       name: "Admin",
       url: "/admin",
     },
     {
       name: "Çıkış",
-      url: "/logout",
     },
   ];
+
   return (
     <div className="bg-gray-100 h-16 px-5 flex items-center justify-between">
-      <div className="text-4xl">e.com</div>
+      <div className="text-4xl">
+        <Link to="/">e.com</Link>
+      </div>
       <div className="flex items-center gap-5">
         <div className="flex items-center">
           <input
@@ -63,17 +71,17 @@ const Header = () => {
         <div className="relative">
           <img
             onClick={() => setOpenMenu(!openMenu)}
-            src={user?.user ? user?.user?.avatar?.url : "/profile.png"}
+            src={user?.avatar ? user?.avatar?.url : "/profile.png"}
             alt="profil"
             className="w-8 h-8 rounded-full cursor-pointer"
           />
           {openMenu && (
-            <div className="absolute right-0 mt-3 w-[200px] bg-white shadow-lg shadow-gray-400 z-1">
+            <div className="absolute right-0 mt-3 w-[200px] bg-white shadow-lg shadow-gray-400 z-40">
               {menuItems.map((item, key) => (
                 <div
                   onClick={() => menuFunc(item)}
                   key={key}
-                  className="px-2 py-1 hover:bg-gray-100 cursor-pointer"
+                  className="px-2 py-2 hover:bg-gray-100 cursor-pointer "
                 >
                   {item.name}
                 </div>
@@ -83,9 +91,11 @@ const Header = () => {
         </div>
         <div onClick={() => navigate("/cart")} className="relative">
           <SlBasket size={30} />
-          <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-            {carts?.length}
-          </div>
+          {carts?.length > 0 && (
+            <div className="absolute -top-2 -right-2 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center text-white text-sm">
+              {carts.length}
+            </div>
+          )}
         </div>
       </div>
     </div>

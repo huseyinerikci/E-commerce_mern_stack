@@ -11,7 +11,7 @@ const authMid = async (req, res, next) => {
   const token = authHeader.split(" ")[1];
 
   try {
-    const decodedData = jwt.verify(token, "SECRETTOKEN");
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
 
     const user = await User.findById(decodedData.id);
 

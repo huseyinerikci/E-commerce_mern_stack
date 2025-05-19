@@ -36,7 +36,7 @@ const register = async (req, res) => {
     },
   });
 
-  const token = await jwt.sign({ id: newUser._id }, "SECRETTOKEN", {
+  const token = await jwt.sign({ id: newUser._id }, process.env.JWT_SECRET, {
     expiresIn: "1h",
   });
   const cookieOptions = {
@@ -62,7 +62,7 @@ const login = async (req, res) => {
     return res.status(500).json({ message: "Şifre hatalı" });
   }
 
-  const token = await jwt.sign({ id: user._id }, "SECRETTOKEN", {
+  const token = await jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
     expiresIn: "7d",
   });
   const cookieOptions = {
@@ -156,7 +156,9 @@ const resetPassword = async (req, res) => {
 
   await user.save();
 
-  const token = jwt.sign({ id: user._id }, "SECRETTOKEN", { expiresIn: "1h" });
+  const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    expiresIn: "1h",
+  });
 
   const cookieOptions = {
     httpOnly: true,

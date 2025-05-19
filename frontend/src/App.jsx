@@ -16,12 +16,26 @@ import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Cart from "./pages/Cart";
 import Admin from "./pages/Admin";
+import { hydrateCart } from "./redux/slice/cartSlice";
 const App = () => {
+  const { user, isAuth, loading } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const { user, isAuth } = useSelector((state) => state.user);
+
   useEffect(() => {
-    dispatch(profile());
-  }, [dispatch]);
+    const token = localStorage.getItem("token");
+    if (token && !isAuth) {
+      dispatch(profile());
+    }
+  }, [dispatch, isAuth]);
+
+  useEffect(() => {
+    if (isAuth) {
+      dispatch(hydrateCart()); // Kullanıcı giriş yaptıysa sepeti localStorage'tan yeniden yükle
+    }
+  }, [isAuth, dispatch]);
+  if (loading) {
+    return <div className="text-center mt-10">Yükleniyor...</div>;
+  }
   return (
     <BrowserRouter>
       <Header />
@@ -32,14 +46,31 @@ const App = () => {
         <Route path="/reset/:token" element={<ResetPassword />} />
         <Route path="/cart" element={<Cart />} />
 
-        <Route element={<ProtectedRoute isAdmin={false} />}>
+        <Route
+          element={
+            <ProtectedRoute
+              isAuth={isAuth}
+              isAdmin={false}
+              user={user}
+              loading={loading}
+            />
+          }
+        >
           <Route path="/profile" element={<Profile />} />
         </Route>
 
-        <Route element={<ProtectedRoute isAdmin={true} user={user} />}>
+        <Route
+          element={
+            <ProtectedRoute
+              isAuth={isAuth}
+              isAdmin={true}
+              user={user}
+              loading={loading}
+            />
+          }
+        >
           <Route path="/admin" element={<Admin />} />
         </Route>
-
         <Route path="/products" element={<Products />} />
         <Route path="/product/:id" element={<Detail />} />
       </Routes>
